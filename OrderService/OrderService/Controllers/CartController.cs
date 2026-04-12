@@ -7,27 +7,27 @@ namespace OrderService.Controllers;
 [Route("api/[controller]")]
 public class CartController : ControllerBase
 {
-    private static List<Cart> _carts = new();
+    private static List<OrderService.Models.Cart> _carts = new();
 
     [HttpGet("{userId}")]
-    public ActionResult<Cart> GetCart(int userId)
+    public ActionResult<OrderService.Models.Cart> GetCart(int userId)
     {
         var cart = _carts.FirstOrDefault(c => c.UserId == userId);
         if (cart == null)
         {
-            cart = new Cart { UserId = userId };
+            cart = new OrderService.Models.Cart { UserId = userId };
             _carts.Add(cart);
         }
         return cart;
     }
 
     [HttpPost("{userId}/items")]
-    public ActionResult<Cart> AddItem(int userId, [FromBody] CartItem item)
+    public ActionResult<OrderService.Models.Cart> AddItem(int userId, [FromBody] CartItem item)
     {
         var cart = _carts.FirstOrDefault(c => c.UserId == userId);
         if (cart == null)
         {
-            cart = new Cart { UserId = userId };
+            cart = new OrderService.Models.Cart { UserId = userId };
             _carts.Add(cart);
         }
 
@@ -45,7 +45,7 @@ public class CartController : ControllerBase
     }
 
     [HttpPut("{userId}/items/{productId}")]
-    public ActionResult<Cart> UpdateItem(int userId, int productId, [FromBody] CartItem updatedItem)
+    public ActionResult<OrderService.Models.Cart> UpdateItem(int userId, int productId, [FromBody] CartItem updatedItem)
     {
         var cart = _carts.FirstOrDefault(c => c.UserId == userId);
         if (cart == null) return NotFound();
@@ -60,7 +60,7 @@ public class CartController : ControllerBase
     }
 
     [HttpDelete("{userId}/items/{productId}")]
-    public ActionResult<Cart> RemoveItem(int userId, int productId)
+    public ActionResult<OrderService.Models.Cart> RemoveItem(int userId, int productId)
     {
         var cart = _carts.FirstOrDefault(c => c.UserId == userId);
         if (cart == null) return NotFound();
