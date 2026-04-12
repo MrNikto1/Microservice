@@ -58,7 +58,7 @@ else
 }
 
 @code {
-    private Cart? cart;
+    private CartData? cart;
     private string? message;
     private int currentUserId = 1;
 
@@ -69,7 +69,7 @@ else
 
     private async Task LoadCart()
     {
-        cart = await Http.GetFromJsonAsync<Cart>($"http://localhost:5002/api/cart/{currentUserId}");
+        cart = await Http.GetFromJsonAsync<CartData>($"http://localhost:5002/api/cart/{currentUserId}");
     }
 
     private async Task RemoveItem(int productId)
@@ -99,7 +99,7 @@ else
         await LoadCart();
     }
 
-    public class Cart
+    public class CartData
     {
         public int UserId { get; set; }
         public List<CartItem> Items { get; set; } = new();
