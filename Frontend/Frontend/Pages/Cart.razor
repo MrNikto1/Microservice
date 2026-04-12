@@ -1,9 +1,19 @@
 @page "/cart"
 @inject HttpClient Http
+@inject UserState UserState
+@inject NavigationManager Navigation
 
 <h3>Shopping Cart</h3>
 
-@if (cart == null)
+@if (!UserState.IsAuthenticated)
+{
+    <div class="alert alert-warning">
+        You must be logged in to view your cart. 
+        <a href="/login" class="alert-link">Login here</a> or 
+        <a href="/register" class="alert-link">register</a>.
+    </div>
+}
+else if (cart == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -60,21 +70,23 @@ else
 @code {
     private CartData? cart;
     private string? message;
-    private int currentUserId = 1;
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadCart();
+        if (UserState.IsAuthenticated)
+        {
+            await LoadCart();
+        }
     }
 
     private async Task LoadCart()
     {
-        cart = await Http.GetFromJsonAsync<CartData>($"http://localhost:5002/api/cart/{currentUserId}");
+        cart = await Http.GetFromJsonAsync<CartData>($"api/cart/{UserState.CurrentUserId}");
     }
 
     private async Task RemoveItem(int productId)
     {
-        await Http.DeleteAsync($"http://localhost:5002/api/cart/{currentUserId}/items/{productId}");
+        await Http.DeleteAsync($"api/cart/{UserState.CurrentUserId}/items/{productId}");
         message = "Item removed from cart";
         await LoadCart();
     }
@@ -85,7 +97,7 @@ else
 
         var order = new
         {
-            userId = currentUserId,
+            userId = UserState.CurrentUserId,
             items = cart.Items,
             total = cart.Items.Sum(i => i.Price * i.Quantity)
         };
@@ -93,7 +105,7 @@ else
         await Http.PostAsJsonAsync("http://localhost:5001/api/order", order);
         
         // Clear the cart after checkout
-        await Http.DeleteAsync($"http://localhost:5002/api/cart/{currentUserId}");
+        await Http.DeleteAsync($"api/cart/{UserState.CurrentUserId}");
         
         message = "Order placed successfully!";
         await LoadCart();

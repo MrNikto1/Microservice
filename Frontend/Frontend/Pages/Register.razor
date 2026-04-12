@@ -1,6 +1,7 @@
 @page "/register"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject UserState UserState
 
 <h3>Register</h3>
 
@@ -47,15 +48,24 @@
                 password = password
             };
 
-            var response = await Http.PostAsJsonAsync("http://localhost:5003/api/user/register", user);
+            var response = await Http.PostAsJsonAsync("api/user/register", user);
             
             if (response.IsSuccessStatusCode)
             {
-                message = "Registration successful! You can now login.";
-                isError = false;
-                // Redirect to login or home page after successful registration
-                await Task.Delay(2000);
-                Navigation.NavigateTo("/");
+                var registeredUser = await response.Content.ReadFromJsonAsync<UserResponse>();
+                if (registeredUser != null)
+                {
+                    UserState.SetCurrentUser(registeredUser.Id, registeredUser.Name, registeredUser.Email);
+                    message = "Registration successful!";
+                    isError = false;
+                    await Task.Delay(1000);
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    message = "Registration successful but failed to get user data.";
+                    isError = true;
+                }
             }
             else
             {
@@ -69,5 +79,12 @@
             message = $"Error: {ex.Message}";
             isError = true;
         }
+    }
+
+    public class UserResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }
