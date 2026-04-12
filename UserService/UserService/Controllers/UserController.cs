@@ -9,7 +9,7 @@ public class UserController : ControllerBase
 {
     private static List<User> _users = new()
     {
-        new User { Id = 1, Name = "John Doe", Email = "john@example.com" }
+        new User { Id = 1, Name = "John Doe", Email = "john@example.com", Password = "password123" }
     };
 
     [HttpGet]
@@ -23,12 +23,33 @@ public class UserController : ControllerBase
         return user;
     }
 
+    [HttpPost("register")]
+    public ActionResult<User> Register(User user)
+    {
+        if (_users.Any(u => u.Email == user.Email))
+        {
+            return BadRequest(new { message = "Email already exists" });
+        }
+        
+        user.Id = _users.Max(u => u.Id) + 1;
+        _users.Add(user);
+        return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+    }
+
     [HttpPost]
     public ActionResult<User> Create(User user)
     {
         user.Id = _users.Max(u => u.Id) + 1;
         _users.Add(user);
         return CreatedAtAction(nameof(GetById), new { id = user.Id }, user);
+    }
+
+    [HttpPost("login")]
+    public ActionResult<User> Login([FromBody] LoginRequest request)
+    {
+        var user = _users.FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
+        if (user == null) return Unauthorized(new { message = "Invalid credentials" });
+        return Ok(user);
     }
 
     [HttpPut("{id}")]
@@ -49,4 +70,10 @@ public class UserController : ControllerBase
         _users.Remove(user);
         return NoContent();
     }
+}
+
+public class LoginRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }

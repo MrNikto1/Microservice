@@ -1,0 +1,115 @@
+@page "/cart"
+@inject HttpClient Http
+
+<h3>Shopping Cart</h3>
+
+@if (cart == null)
+{
+    <p><em>Loading...</em></p>
+}
+else if (cart.Items.Count == 0)
+{
+    <p>Your cart is empty.</p>
+    <a href="/products" class="btn btn-primary">Browse Products</a>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in cart.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@((item.Price * item.Quantity).ToString("C"))</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm" @onclick="() => RemoveItem(item.ProductId)">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td colspan="2"><strong>@cart.Items.Sum(i => i.Price * i.Quantity).ToString("C")</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="mt-3">
+        <button class="btn btn-success" @onclick="Checkout">Checkout</button>
+        <a href="/products" class="btn btn-secondary ms-2">Continue Shopping</a>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info mt-3">@message</div>
+}
+
+@code {
+    private Cart? cart;
+    private string? message;
+    private int currentUserId = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCart();
+    }
+
+    private async Task LoadCart()
+    {
+        cart = await Http.GetFromJsonAsync<Cart>($"http://localhost:5002/api/cart/{currentUserId}");
+    }
+
+    private async Task RemoveItem(int productId)
+    {
+        await Http.DeleteAsync($"http://localhost:5002/api/cart/{currentUserId}/items/{productId}");
+        message = "Item removed from cart";
+        await LoadCart();
+    }
+
+    private async Task Checkout()
+    {
+        if (cart == null || cart.Items.Count == 0) return;
+
+        var order = new
+        {
+            userId = currentUserId,
+            items = cart.Items,
+            total = cart.Items.Sum(i => i.Price * i.Quantity)
+        };
+
+        await Http.PostAsJsonAsync("http://localhost:5001/api/order", order);
+        
+        // Clear the cart after checkout
+        await Http.DeleteAsync($"http://localhost:5002/api/cart/{currentUserId}");
+        
+        message = "Order placed successfully!";
+        await LoadCart();
+    }
+
+    public class Cart
+    {
+        public int UserId { get; set; }
+        public List<CartItem> Items { get; set; } = new();
+    }
+
+    public class CartItem
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public int Quantity { get; set; }
+        public decimal Price { get; set; }
+    }
+}

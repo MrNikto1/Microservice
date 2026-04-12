@@ -1,14 +1,12 @@
 namespace OrderService.Models;
 
-public class Order
+public class Cart
 {
-    public int Id { get; set; }
     public int UserId { get; set; }
-    public List<OrderItem> Items { get; set; } = new();
-    public decimal Total { get; set; }
+    public List<CartItem> Items { get; set; } = new();
 }
 
-public class OrderItem
+public class CartItem
 {
     public int ProductId { get; set; }
     public string ProductName { get; set; } = string.Empty;

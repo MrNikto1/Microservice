@@ -1,0 +1,62 @@
+@page "/login"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Login</h3>
+
+<div class="row">
+    <div class="col-md-6">
+        <form @onsubmit="HandleLogin">
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" @bind="email" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input type="password" class="form-control" @bind="password" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Login</button>
+        </form>
+        <p class="mt-3">
+            Don't have an account? <a href="/register">Register here</a>
+        </p>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-danger mt-3">@message</div>
+}
+
+@code {
+    private string email = "";
+    private string password = "";
+    private string message = "";
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var credentials = new
+            {
+                email = email,
+                password = password
+            };
+
+            var response = await Http.PostAsJsonAsync("http://localhost:5003/api/user/login", credentials);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                Navigation.NavigateTo("/");
+            }
+            else
+            {
+                message = "Invalid email or password";
+            }
+        }
+        catch (Exception ex)
+        {
+            message = $"Error: {ex.Message}";
+        }
+    }
+}

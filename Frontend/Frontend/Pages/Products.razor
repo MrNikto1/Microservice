@@ -15,6 +15,7 @@ else
                 <th>Id</th>
                 <th>Name</th>
                 <th>Price</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -24,18 +25,35 @@ else
                     <td>@product.Id</td>
                     <td>@product.Name</td>
                     <td>@product.Price</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm" @onclick="() => AddToCart(product)">Add to Cart</button>
+                    </td>
                 </tr>
             }
         </tbody>
     </table>
 }
 
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info">@message</div>
+}
+
 @code {
     private Product[]? products;
+    private string? message;
+    private int currentUserId = 1;
 
     protected override async Task OnInitializedAsync()
     {
         products = await Http.GetFromJsonAsync<Product[]>("api/product");
+    }
+
+    private async Task AddToCart(Product product)
+    {
+        var cartItem = new { productId = product.Id, productName = product.Name, quantity = 1, price = product.Price };
+        await Http.PostAsJsonAsync($"http://localhost:5002/api/cart/{currentUserId}/items", cartItem);
+        message = $"{product.Name} added to cart!";
     }
 
     public class Product
