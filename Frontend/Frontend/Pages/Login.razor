@@ -1,6 +1,7 @@
 @page "/login"
 @inject HttpClient Http
 @inject NavigationManager Navigation
+@inject UserState UserState
 
 <h3>Login</h3>
 
@@ -43,11 +44,20 @@
                 password = password
             };
 
-            var response = await Http.PostAsJsonAsync("http://localhost:5003/api/user/login", credentials);
+            var response = await Http.PostAsJsonAsync("api/user/login", credentials);
             
             if (response.IsSuccessStatusCode)
             {
-                Navigation.NavigateTo("/");
+                var user = await response.Content.ReadFromJsonAsync<UserResponse>();
+                if (user != null)
+                {
+                    UserState.SetCurrentUser(user.Id, user.Name, user.Email);
+                    Navigation.NavigateTo("/");
+                }
+                else
+                {
+                    message = "Invalid email or password";
+                }
             }
             else
             {
@@ -58,5 +68,12 @@
         {
             message = $"Error: {ex.Message}";
         }
+    }
+
+    public class UserResponse
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
     }
 }

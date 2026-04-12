@@ -1,5 +1,6 @@
 @page "/products"
 @inject HttpClient Http
+@inject UserState UserState
 
 <h3>Products</h3>
 
@@ -26,7 +27,14 @@ else
                     <td>@product.Name</td>
                     <td>@product.Price</td>
                     <td>
-                        <button class="btn btn-primary btn-sm" @onclick="() => AddToCart(product)">Add to Cart</button>
+                        @if (UserState.IsAuthenticated)
+                        {
+                            <button class="btn btn-primary btn-sm" @onclick="() => AddToCart(product)">Add to Cart</button>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Login to add to cart</span>
+                        }
                     </td>
                 </tr>
             }
@@ -42,7 +50,6 @@ else
 @code {
     private Product[]? products;
     private string? message;
-    private int currentUserId = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,9 +58,22 @@ else
 
     private async Task AddToCart(Product product)
     {
+        if (!UserState.IsAuthenticated)
+        {
+            message = "Please login to add items to cart";
+            return;
+        }
+
         var cartItem = new { productId = product.Id, productName = product.Name, quantity = 1, price = product.Price };
-        await Http.PostAsJsonAsync($"http://localhost:5002/api/cart/{currentUserId}/items", cartItem);
-        message = $"{product.Name} added to cart!";
+        var response = await Http.PostAsJsonAsync($"api/cart/{UserState.CurrentUserId}/items", cartItem);
+        if (response.IsSuccessStatusCode)
+        {
+            message = $"{product.Name} added to cart!";
+        }
+        else
+        {
+            message = "Failed to add item to cart";
+        }
     }
 
     public class Product
