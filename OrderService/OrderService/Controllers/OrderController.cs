@@ -8,6 +8,7 @@ namespace OrderService.Controllers;
 public class OrderController : ControllerBase
 {
     private static List<Order> _orders = new();
+    private int _nextOrderId = 1;
 
     [HttpGet]
     public IEnumerable<Order> GetAll() => _orders;
@@ -20,10 +21,13 @@ public class OrderController : ControllerBase
         return order;
     }
 
+    [HttpGet("user/{userId}")]
+    public IEnumerable<Order> GetByUserId(int userId) => _orders.Where(o => o.UserId == userId);
+
     [HttpPost]
     public ActionResult<Order> Create(Order order)
     {
-        order.Id = _orders.Any() ? _orders.Max(o => o.Id) + 1 : 1;
+        order.Id = _nextOrderId++;
         _orders.Add(order);
         return CreatedAtAction(nameof(GetById), new { id = order.Id }, order);
     }
@@ -34,7 +38,7 @@ public class OrderController : ControllerBase
         var order = _orders.FirstOrDefault(o => o.Id == id);
         if (order == null) return NotFound();
         order.UserId = updatedOrder.UserId;
-        order.ProductIds = updatedOrder.ProductIds;
+        order.Items = updatedOrder.Items;
         order.Total = updatedOrder.Total;
         return NoContent();
     }

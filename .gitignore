@@ -1,0 +1,47 @@
+```
+# Build artifacts
+obj/
+bin/
+*.dll
+*.exe
+*.pdb
+*.config
+*.csproj.user
+*.userprefs
+
+# Dependencies
+node_modules/
+packages/
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+htmlcov/
+*.coverage
+
+# Local DB files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+temp/
+```
