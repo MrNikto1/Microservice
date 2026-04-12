@@ -18,7 +18,7 @@ public class OrderController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var response = await _httpClient.GetAsync("http://localhost:5002/api/order");
+        var response = await _httpClient.GetAsync("http://orderservice:8080/api/order");
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         return Content(content, "application/json");
@@ -27,7 +27,7 @@ public class OrderController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var response = await _httpClient.GetAsync($"http://localhost:5002/api/order/{id}");
+        var response = await _httpClient.GetAsync($"http://orderservice:8080/api/order/{id}");
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         return Content(content, "application/json");
@@ -38,7 +38,7 @@ public class OrderController : ControllerBase
     {
         var json = JsonSerializer.Serialize(order);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync("http://localhost:5002/api/order", content);
+        var response = await _httpClient.PostAsync("http://orderservice:8080/api/order", content);
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var result = await response.Content.ReadAsStringAsync();
         return Content(result, "application/json");
@@ -49,14 +49,14 @@ public class OrderController : ControllerBase
     {
         var json = JsonSerializer.Serialize(order);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"http://localhost:5002/api/order/{id}", content);
+        var response = await _httpClient.PutAsync($"http://orderservice:8080/api/order/{id}", content);
         return StatusCode((int)response.StatusCode);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var response = await _httpClient.DeleteAsync($"http://localhost:5002/api/order/{id}");
+        var response = await _httpClient.DeleteAsync($"http://orderservice:8080/api/order/{id}");
         return StatusCode((int)response.StatusCode);
     }
 }

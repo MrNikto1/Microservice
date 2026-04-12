@@ -1,31 +1,72 @@
 ```
+# Dependencies
+node_modules/
+packages/
+
 # Build artifacts
 bin/
 obj/
-*.dll
-*.exe
-*.pdb
-*.runtimeconfig.dev.json
-
-# Dependencies
-packages/
-node_modules/
+out/
+dist/
+build/
+target/
 
 # Logs
 *.log
+logs/
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# Editors
+# IDE
 .vscode/
 .idea/
 *.swp
-*.tmp
+*.swo
 
-# OS generated files
+# OS
 .DS_Store
 Thumbs.db
+
+# Testing
+coverage/
+htmlcov/
+.coverage
+*.coverage
+
+# Python specific
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Node.js specific
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Java specific
+*.class
+*.jar
+*.war
+*.ear
+hs_err_pid*
+
+# C# specific
+*.userprefs
+[Nn]uget[Pp]ackages/
+*.nupkg
+appsettings*.json
+bundleconfig.json
+
+# Docker
+.dockerignore
+!Dockerfile
+!docker-compose.yml
 ```

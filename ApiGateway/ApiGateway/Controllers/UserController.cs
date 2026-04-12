@@ -18,7 +18,7 @@ public class UserController : ControllerBase
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var response = await _httpClient.GetAsync("http://localhost:5003/api/user");
+        var response = await _httpClient.GetAsync("http://userservice:8080/api/user");
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         return Content(content, "application/json");
@@ -27,7 +27,7 @@ public class UserController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var response = await _httpClient.GetAsync($"http://localhost:5003/api/user/{id}");
+        var response = await _httpClient.GetAsync($"http://userservice:8080/api/user/{id}");
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var content = await response.Content.ReadAsStringAsync();
         return Content(content, "application/json");
@@ -38,7 +38,7 @@ public class UserController : ControllerBase
     {
         var json = JsonSerializer.Serialize(user);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PostAsync("http://localhost:5003/api/user", content);
+        var response = await _httpClient.PostAsync("http://userservice:8080/api/user", content);
         if (!response.IsSuccessStatusCode) return StatusCode((int)response.StatusCode);
         var result = await response.Content.ReadAsStringAsync();
         return Content(result, "application/json");
@@ -49,14 +49,14 @@ public class UserController : ControllerBase
     {
         var json = JsonSerializer.Serialize(user);
         var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-        var response = await _httpClient.PutAsync($"http://localhost:5003/api/user/{id}", content);
+        var response = await _httpClient.PutAsync($"http://userservice:8080/api/user/{id}", content);
         return StatusCode((int)response.StatusCode);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var response = await _httpClient.DeleteAsync($"http://localhost:5003/api/user/{id}");
+        var response = await _httpClient.DeleteAsync($"http://userservice:8080/api/user/{id}");
         return StatusCode((int)response.StatusCode);
     }
 }

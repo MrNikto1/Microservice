@@ -4,6 +4,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddCors();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -16,5 +17,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
